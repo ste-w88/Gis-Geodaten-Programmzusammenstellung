@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lernplan GIS & PyVista</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 24px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: #ffffff;
+    color: #2c2c2a;
+  }
+  @media (prefers-color-scheme: dark) {
+    body { background: #1a1a18; color: #e0ded6; }
+  }
+  h1 { font-size: 20px; font-weight: 500; margin: 0 0 4px; }
+  .subtitle { font-size: 13px; color: #73726c; margin-bottom: 24px; }
+  @media (prefers-color-scheme: dark) { .subtitle { color: #9c9a92; } }
+
+  .plan { padding: 0; }
+  .phase-header {
+    display: flex; align-items: center; gap: 10px;
+    margin: 20px 0 10px;
+  }
+  .phase-pill {
+    font-size: 11px; font-weight: 500; padding: 3px 10px;
+    border-radius: 20px; white-space: nowrap;
+  }
+  .phase-line { flex: 1; height: 0.5px; background: rgba(0,0,0,0.12); }
+  @media (prefers-color-scheme: dark) { .phase-line { background: rgba(255,255,255,0.1); } }
+  .phase-dur { font-size: 11px; color: #73726c; white-space: nowrap; }
+  @media (prefers-color-scheme: dark) { .phase-dur { color: #9c9a92; } }
+
+  .weeks { display: flex; flex-direction: column; gap: 6px; }
+  .week { display: grid; grid-template-columns: 56px 1fr; gap: 0 12px; align-items: start; }
+  .week-num { font-size: 11px; color: #9c9a92; padding-top: 11px; text-align: right; }
+  .week-card {
+    border: 0.5px solid rgba(0,0,0,0.12);
+    border-radius: 8px;
+    padding: 9px 13px;
+    cursor: pointer;
+    transition: border-color 0.15s;
+    background: #f5f5f2;
+  }
+  @media (prefers-color-scheme: dark) {
+    .week-card { background: #26261f; border-color: rgba(255,255,255,0.1); }
+    .week-card:hover { border-color: rgba(255,255,255,0.25); }
+  }
+  .week-card:hover { border-color: rgba(0,0,0,0.3); }
+  .week-card.open { border-color: rgba(0,0,0,0.2); }
+  .week-top { display: flex; align-items: center; gap: 8px; }
+  .week-tag { font-size: 10px; font-weight: 500; padding: 2px 7px; border-radius: 10px; white-space: nowrap; flex-shrink: 0; }
+  .week-title { font-size: 13px; font-weight: 500; }
+  .week-h { font-size: 11px; color: #9c9a92; margin-left: auto; white-space: nowrap; }
+  .week-detail {
+    margin-top: 8px; padding-top: 8px;
+    border-top: 0.5px solid rgba(0,0,0,0.1);
+    display: none;
+  }
+  @media (prefers-color-scheme: dark) { .week-detail { border-top-color: rgba(255,255,255,0.08); } }
+  .week-card.open .week-detail { display: block; }
+  .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 16px; }
+  .detail-item { font-size: 12px; color: #5f5e5a; line-height: 1.5; }
+  @media (prefers-color-scheme: dark) { .detail-item { color: #b0ae a4; } }
+  .detail-item b { color: #2c2c2a; font-weight: 500; }
+  @media (prefers-color-scheme: dark) { .detail-item b { color: #e0ded6; } }
+  .code-chip {
+    display: inline-block; font-size: 11px; font-family: "SF Mono", "Fira Code", monospace;
+    background: rgba(0,0,0,0.06); border: 0.5px solid rgba(0,0,0,0.1);
+    border-radius: 4px; padding: 1px 5px; margin: 2px 2px 0 0;
+  }
+  @media (prefers-color-scheme: dark) {
+    .code-chip { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.1); }
+  }
+  .milestone { margin: 14px 0 6px; display: flex; align-items: center; gap: 8px; }
+  .ms-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .ms-text { font-size: 12px; color: #5f5e5a; }
+  @media (prefers-color-scheme: dark) { .ms-text { color: #9c9a92; } }
+
+  .p1 { background: #E6F1FB; color: #0C447C; }
+  .p2 { background: #E1F5EE; color: #085041; }
+  .p3 { background: #EEEDFE; color: #3C3489; }
+  .p4 { background: #FAEEDA; color: #633806; }
+  @media (prefers-color-scheme: dark) {
+    .p1 { background: #0C447C; color: #B5D4F4; }
+    .p2 { background: #085041; color: #9FE1CB; }
+    .p3 { background: #3C3489; color: #CECBF6; }
+    .p4 { background: #633806; color: #FAC775; }
+  }
+  .dot1 { background: #378ADD; }
+  .dot2 { background: #1D9E75; }
+  .dot3 { background: #7F77DD; }
+  .dot4 { background: #BA7517; }
+</style>
+</head>
+<body>
+
+<h1>Lernplan GIS & PyVista</h1>
+<p class="subtitle">16 Wochen · 4–6 Stunden/Woche · Schwerpunkt Bauwesen</p>
+
+<div class="plan">
+  <div class="phase-header">
+    <span class="phase-pill p1">Phase 1</span>
+    <span class="phase-line"></span>
+    <span class="phase-dur">Woche 1–4 · Python-Fundament</span>
+  </div>
+  <div class="weeks" id="phase1"></div>
+
+  <div class="phase-header">
+    <span class="phase-pill p2">Phase 2</span>
+    <span class="phase-line"></span>
+    <span class="phase-dur">Woche 5–10 · GIS &amp; Geodaten</span>
+  </div>
+  <div class="weeks" id="phase2"></div>
+
+  <div class="phase-header">
+    <span class="phase-pill p3">Phase 3</span>
+    <span class="phase-line"></span>
+    <span class="phase-dur">Woche 11–14 · PyVista &amp; 3D</span>
+  </div>
+  <div class="weeks" id="phase3"></div>
+
+  <div class="phase-header">
+    <span class="phase-pill p4">Phase 4</span>
+    <span class="phase-line"></span>
+    <span class="phase-dur">Woche 15–16 · Abschlussprojekt</span>
+  </div>
+  <div class="weeks" id="phase4"></div>
+</div>
+
+<script>
+const WEEKS = [
+  { phase:1, w:1,  tag:'p1', title:'Python auffrischen',          h:'4–5 h',
+    themen:['Datentypen, Listen, Dicts','Funktionen & Schleifen','Dateien lesen/schreiben'],
+    tools:['python','jupyter'],
+    uebung:'CSV mit Grundstücksdaten einlesen und ausgeben',
+    ziel:'Sicherer Umgang mit Grundstrukturen' },
+
+  { phase:1, w:2,  tag:'p1', title:'NumPy & Pandas',              h:'5–6 h',
+    themen:['Arrays und Vektoren mit NumPy','DataFrames mit Pandas','Daten filtern & gruppieren'],
+    tools:['numpy','pandas'],
+    uebung:'Tabelle mit Parzellen nach Fläche sortieren und auswerten',
+    ziel:'Tabellendaten effizient verarbeiten' },
+
+  { phase:1, w:3,  tag:'p1', title:'Matplotlib & erste Plots',    h:'4–5 h',
+    themen:['Linien- und Balkenplots','Achsenbeschriftung & Massstab','Subplots & Layout'],
+    tools:['matplotlib'],
+    uebung:'Höhenprofile aus Messpunkten plotten',
+    ziel:'Daten visuell darstellen können' },
+
+  { phase:1, w:4,  tag:'p1', title:'Umgebung & Workflow',         h:'3–4 h',
+    themen:['Virtuelle Umgebungen (venv)','Jupyter Notebooks','Projektstruktur'],
+    tools:['venv','jupyter','pip'],
+    uebung:'Erste eigene Projektumgebung aufsetzen',
+    ziel:'Sauberer, reproduzierbarer Workflow' },
+
+  { phase:2, w:5,  tag:'p2', title:'Koordinatensysteme & Proj',   h:'5–6 h',
+    themen:['Geographische vs. projizierte KS','LV95, WGS84, CH1903+','Koordinaten umrechnen mit PyProj'],
+    tools:['pyproj'],
+    uebung:'GPS-Koordinaten in Schweizer LV95 umrechnen',
+    ziel:'Grundlagen der Geodäsie verstehen' },
+
+  { phase:2, w:6,  tag:'p2', title:'Vektordaten mit Shapely',     h:'5–6 h',
+    themen:['Punkte, Linien, Polygone','Flächen & Abstände berechnen','Verschneidungen & Buffer'],
+    tools:['shapely'],
+    uebung:'Parzellen-Polygon: Fläche, Umfang, Abstände berechnen',
+    ziel:'Geometrische Operationen auf Geodaten' },
+
+  { phase:2, w:7,  tag:'p2', title:'GeoPandas Grundlagen',        h:'5–6 h',
+    themen:['GeoDataFrame erstellen & laden','Shapefiles lesen/schreiben','Kartendarstellung mit .plot()'],
+    tools:['geopandas','fiona'],
+    uebung:'Grundstücke nach Zone einfärben und als Karte ausgeben',
+    ziel:'Geodaten tabellarisch verwalten' },
+
+  { phase:2, w:8,  tag:'p2', title:'Räumliche Analysen',          h:'6 h',
+    themen:['Spatial Join & Overlay','Pufferzone, Intersect, Union','Flächen & Distanzanalysen'],
+    tools:['geopandas','shapely'],
+    uebung:'Schutzzonen um Gewässer berechnen (Baulinien-Analyse)',
+    ziel:'Baurechtsrelevante GIS-Analysen' },
+
+  { phase:2, w:9,  tag:'p2', title:'Rasterdaten & DGM',           h:'5–6 h',
+    themen:['GeoTIFF laden mit Rasterio','Höhenmodelle (DTM/DSM)','Hangneigung & Exposition berechnen'],
+    tools:['rasterio','numpy'],
+    uebung:'Hangneigungskarte aus Swisstopo-DGM erzeugen',
+    ziel:'Geländemodelle auswerten' },
+
+  { phase:2, w:10, tag:'p2', title:'Webkarten & Export',          h:'4–5 h',
+    themen:['Interaktive Karten mit Folium','GeoJSON exportieren','PDF-Lageplan erzeugen'],
+    tools:['folium','geopandas'],
+    uebung:'Interaktiven Lageplan mit Grundstücksdaten im Browser darstellen',
+    ziel:'Ergebnisse kommunizieren & teilen' },
+
+  { phase:3, w:11, tag:'p3', title:'PyVista Einstieg',            h:'5–6 h',
+    themen:['Installation & erste Szene','Mesh-Objekte: Punkte, Flächen, Volumen','Kamera & Licht einstellen'],
+    tools:['pyvista'],
+    uebung:'Einfachen Baukörper (Quader) als 3D-Mesh anzeigen',
+    ziel:'3D-Visualisierung verstehen' },
+
+  { phase:3, w:12, tag:'p3', title:'Geländemodelle in 3D',        h:'5–6 h',
+    themen:['Raster → 3D-Mesh konvertieren','Höhenfärbung & Colormap','Interaktive 3D-Ansicht'],
+    tools:['pyvista','rasterio','numpy'],
+    uebung:'DGM aus Rasterio als 3D-Geländeoberfläche in PyVista darstellen',
+    ziel:'GIS-Daten in 3D bringen' },
+
+  { phase:3, w:13, tag:'p3', title:'Punktwolken & Laserscanning', h:'5–6 h',
+    themen:['LAS/LAZ-Dateien laden mit laspy','Punktwolke in PyVista rendern','Filtern nach Klassen (Boden, Gebäude)'],
+    tools:['pyvista','laspy','numpy'],
+    uebung:'Laserscan-Punktwolke eines Gebäudes laden und visualisieren',
+    ziel:'Bestandsaufnahme 3D auswerten' },
+
+  { phase:3, w:14, tag:'p3', title:'Baukörper & Analyse',         h:'5–6 h',
+    themen:['Volumenkörper erstellen & kombinieren','Verschneidung Gelände / Gebäude','Aushubvolumen berechnen'],
+    tools:['pyvista','shapely'],
+    uebung:'Aushubvolumen für Baugrube aus DGM und Grundriss berechnen',
+    ziel:'Praktische 3D-Mengenermittlung' },
+
+  { phase:4, w:15, tag:'p4', title:'Projekt: Daten & Analyse',    h:'5–6 h',
+    themen:['Geodaten eines realen Baugebiets laden','GIS-Analysen (Erschliessung, Zonen, Höhen)','Ergebnisse als Tabelle & Karte'],
+    tools:['geopandas','rasterio','shapely','folium'],
+    uebung:'Eignungsanalyse: Welche Parzellen im Gebiet sind bebaubar?',
+    ziel:'Vollständige GIS-Analyse' },
+
+  { phase:4, w:16, tag:'p4', title:'Projekt: 3D & Präsentation',  h:'5–6 h',
+    themen:['Gelände und Baukörper in 3D kombinieren','Screenshot & Bericht automatisiert erzeugen','Ergebnis präsentieren'],
+    tools:['pyvista','matplotlib','reportlab'],
+    uebung:'Automatisch generierten PDF-Bericht mit Karte, 3D-View und Tabellen',
+    ziel:'Abgeschlossenes Vorzeigeprojekt' },
+];
+
+const MILESTONES = {
+  4:  { cls:'dot1', text:'Meilenstein: Python-Fundament abgeschlossen' },
+  10: { cls:'dot2', text:'Meilenstein: GIS-Analysen selbstständig durchführbar' },
+  14: { cls:'dot3', text:'Meilenstein: 3D-Visualisierungen mit PyVista' },
+  16: { cls:'dot4', text:'Meilenstein: Abschlussprojekt fertig' },
+};
+
+function render() {
+  const containers = { 1:'phase1', 2:'phase2', 3:'phase3', 4:'phase4' };
+  const phaseLabel = ['Python','GIS','PyVista','Projekt'];
+  WEEKS.forEach(w => {
+    const c = document.getElementById(containers[w.phase]);
+    const div = document.createElement('div');
+    div.className = 'week';
+    div.innerHTML = `
+      <div class="week-num">W${w.w}</div>
+      <div class="week-card" onclick="this.classList.toggle('open')">
+        <div class="week-top">
+          <span class="week-tag ${w.tag}">${phaseLabel[w.phase-1]}</span>
+          <span class="week-title">${w.title}</span>
+          <span class="week-h">${w.h}</span>
+        </div>
+        <div class="week-detail">
+          <div class="detail-grid">
+            <div class="detail-item">
+              <b>Themen</b><br>${w.themen.map(t=>'· '+t).join('<br>')}
+            </div>
+            <div class="detail-item">
+              <b>Übung</b><br>${w.uebung}<br><br>
+              <b>Ziel</b><br>${w.ziel}
+            </div>
+          </div>
+          <div style="margin-top:8px">
+            <b style="font-size:11px;color:#73726c">Tools: </b>
+            ${w.tools.map(t=>`<span class="code-chip">${t}</span>`).join('')}
+          </div>
+        </div>
+      </div>`;
+    c.appendChild(div);
+
+    if (MILESTONES[w.w]) {
+      const ms = document.createElement('div');
+      ms.className = 'milestone';
+      ms.innerHTML = `<div class="ms-dot ${MILESTONES[w.w].cls}"></div><span class="ms-text">${MILESTONES[w.w].text}</span>`;
+      c.appendChild(ms);
+    }
+  });
+}
+
+render();
+</script>
+</body>
+</html>
